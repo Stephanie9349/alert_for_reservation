@@ -1,0 +1,36 @@
+name: Naver booking monitor
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # 10분마다 (GitHub 사정에 따라 몇 분씩 늦어질 수 있음)
+  workflow_dispatch:         # Actions 탭에서 수동 실행 가능
+
+concurrency:
+  group: naver-booking-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # 직전 실행의 state.json 복원 (중복 알림 방지용)
+      - uses: actions/cache/restore@v4
+        with:
+          path: state.json
+          key: naver-state-${{ github.run_id }}
+          restore-keys: naver-state-
+
+      - name: Check availability
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 monitor.py
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: state.json
+          key: naver-state-${{ github.run_id }}
