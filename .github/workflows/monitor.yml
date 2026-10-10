@@ -2,7 +2,7 @@ name: Naver booking monitor
 
 on:
   schedule:
-    - cron: "*/10 * * * *"  # 10분마다 (GitHub 사정에 따라 몇 분씩 늦어질 수 있음)
+    - cron: "5,15,25,35,45,55 * * * *"  # 10분마다 (GitHub 사정에 따라 몇 분씩 늦어질 수 있음)
   workflow_dispatch:         # Actions 탭에서 수동 실행 가능
 
 concurrency:
